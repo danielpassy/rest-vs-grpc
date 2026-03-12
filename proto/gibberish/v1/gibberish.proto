@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package gibberish.v1;
+
+option go_package = "github.com/yourorg/rest-vs-grpc/apps/go-server/gen;gen";
+
+service GibberishService {
+  rpc Process(GibberishPayload) returns (ProcessResult);
+}
+
+message Item {
+  string id        = 1;
+  string label     = 2;
+  float  value     = 3;
+  repeated string tags = 4;
+  map<string, string> metadata = 5;
+}
+
+message GibberishPayload {
+  string request_id = 1;
+  string timestamp  = 2;
+  string source     = 3;
+  repeated Item items = 4;
+  int32  checksum   = 5;
+}
+
+message ProcessResult {
+  string request_id    = 1;
+  string processed_at  = 2;
+  int32  item_count    = 3;
+  float  value_sum     = 4;
+  string dominant_tag  = 5;
+  string status        = 6;
+}

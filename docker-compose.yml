@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  go-server:
+    build: ./apps/go-server
+    ports:
+      - "8080:8080"
+      - "50051:50051"
+    environment:
+      SENTRY_DSN: ""
+
+  fastapi-client:
+    build: ./apps/fastapi-client
+    ports:
+      - "8000:8000"
+    depends_on:
+      - go-server
+    environment:
+      GO_SERVER_REST_URL: "http://go-server:8080"
+      GO_SERVER_GRPC_HOST: "go-server"
+      GO_SERVER_GRPC_PORT: "50051"
+      SENTRY_DSN: ""
