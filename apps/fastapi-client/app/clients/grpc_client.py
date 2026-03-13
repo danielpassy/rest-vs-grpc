@@ -31,7 +31,12 @@ async def call_grpc(payload: GibberishPayload) -> ProcessResult:
     target = f"{settings.GO_SERVER_GRPC_HOST}:{settings.GO_SERVER_GRPC_PORT}"
     async with grpc.aio.insecure_channel(target) as channel:
         stub = gibberish_pb2_grpc.GibberishServiceStub(channel)
-        result = await stub.Process(proto_payload)
+        result = await stub.Process(
+            proto_payload,
+            metadata=(
+                ("authorization", f"Bearer {settings.GO_SERVER_AUTH_TOKEN}"),
+            ),
+        )
 
     return ProcessResult(
         request_id=result.request_id,

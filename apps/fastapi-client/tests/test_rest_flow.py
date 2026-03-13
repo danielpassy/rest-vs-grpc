@@ -19,12 +19,13 @@ VALID_PROCESS_RESULT = {
 def test_benchmark_rest_returns_200(client):
     """A successful Go server response yields HTTP 200 from the benchmark endpoint."""
     with respx.mock:
-        respx.post(PROCESS_URL).mock(
+        route = respx.post(PROCESS_URL).mock(
             return_value=httpx.Response(200, json=VALID_PROCESS_RESULT)
         )
         response = client.post("/benchmark/rest")
 
     assert response.status_code == 200
+    assert route.calls.last.request.headers["Authorization"] == "Bearer dev-token"
 
 
 def test_benchmark_rest_result_echoes_request_id(client):
