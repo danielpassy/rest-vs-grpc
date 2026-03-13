@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package gibberish.v1;
 
-option go_package = "github.com/yourorg/rest-vs-grpc/apps/go-server/gen;gen";
+option go_package = "github.com/danielpassy/rest-vs-grpc/apps/go-server/gen;gen";
 
 service GibberishService {
   rpc Process(GibberishPayload) returns (ProcessResult);

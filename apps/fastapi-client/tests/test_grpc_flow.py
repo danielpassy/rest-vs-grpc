@@ -20,3 +20,12 @@ def test_benchmark_grpc_item_count_matches_payload(client, grpc_settings):
     response = client.post("/benchmark/grpc")
 
     assert response.json()["item_count"] > 0
+
+
+def test_benchmark_grpc_invalid_token_propagates(client, grpc_settings, monkeypatch):
+    """An invalid gRPC token is surfaced as 502 from the FastAPI boundary."""
+    monkeypatch.setattr("app.clients.grpc_client.settings.GO_SERVER_AUTH_TOKEN", "wrong-token")
+
+    response = client.post("/benchmark/grpc")
+
+    assert response.status_code == 502
