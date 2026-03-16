@@ -43,10 +43,11 @@ def grpc_server():
 
 @pytest.fixture
 def grpc_settings(grpc_server, monkeypatch):
-    """Point grpc_client settings at the in-process fake server."""
+    """Point grpc_client settings and channel singleton at the in-process fake server."""
     host, port = grpc_server.split(":")
     monkeypatch.setattr("app.clients.grpc_client.settings.GO_SERVER_GRPC_HOST", host)
     monkeypatch.setattr("app.clients.grpc_client.settings.GO_SERVER_GRPC_PORT", port)
+    monkeypatch.setattr("app.clients.grpc_client._channel", None)
 
 
 @pytest.fixture

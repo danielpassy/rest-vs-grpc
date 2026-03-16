@@ -7,6 +7,17 @@ from app.schema import GibberishPayload, ProcessResult
 from app import settings
 
 
+_channel: grpc.aio.Channel | None = None
+
+
+def _get_channel() -> grpc.aio.Channel:
+    global _channel
+    if _channel is None:
+        target = f"{settings.GO_SERVER_GRPC_HOST}:{settings.GO_SERVER_GRPC_PORT}"
+        _channel = grpc.aio.insecure_channel(target)
+    return _channel
+
+
 async def call_grpc(payload: GibberishPayload) -> ProcessResult:
     """Call GibberishService.Process over gRPC."""
     proto_items = [
@@ -28,15 +39,13 @@ async def call_grpc(payload: GibberishPayload) -> ProcessResult:
         checksum=payload.checksum,
     )
 
-    target = f"{settings.GO_SERVER_GRPC_HOST}:{settings.GO_SERVER_GRPC_PORT}"
-    async with grpc.aio.insecure_channel(target) as channel:
-        stub = gibberish_pb2_grpc.GibberishServiceStub(channel)
-        result = await stub.Process(
-            proto_payload,
-            metadata=(
-                ("authorization", f"Bearer {settings.GO_SERVER_AUTH_TOKEN}"),
-            ),
-        )
+    stub = gibberish_pb2_grpc.GibberishServiceStub(_get_channel())
+    result = await stub.Process(
+        proto_payload,
+        metadata=(
+            ("authorization", f"Bearer {settings.GO_SERVER_AUTH_TOKEN}"),
+        ),
+    )
 
     return ProcessResult(
         request_id=result.request_id,
